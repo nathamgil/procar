@@ -2,7 +2,7 @@
    Site e painel leem e gravam a mesma base, então um agendamento feito
    no site aparece na agenda do painel. */
 (function () {
-  const CHAVE = 'procar_db_v1';
+  const CHAVE = 'procar_db_v2';
   const ETAPAS = [
     { id: 'recebido', nome: 'Recebido', curto: 'Recebido' },
     { id: 'diagnostico', nome: 'Em diagnóstico', curto: 'Diagnóstico' },
@@ -36,7 +36,11 @@
       ['c7', 'Luana Prado', '71 99677-3304', 'Google'],
       ['c8', 'Edson Carvalho (motorista de app)', '71 98140-2251', 'Instagram'],
       ['c9', 'Juliana Matos', '71 99902-7745', 'Indicação'],
-      ['c10', 'Clínica Ondina (frota)', '71 3332-1040', 'Frota']
+      ['c10', 'Clínica Ondina (frota)', '71 3332-1040', 'Frota'],
+      ['c11', 'Bruno Lacerda', '71 98833-5521', 'Google'],
+      ['c12', 'Camila Reis', '71 99714-0086', 'Indicação'],
+      ['c13', 'Thiago Barreto (motorista de app)', '71 98266-7319', 'Instagram'],
+      ['c14', 'Renata Pires', '71 99381-4402', 'Passou na porta']
     ].map(([id, nome, fone, origem]) => ({ id, nome: nome + ' (exemplo)', fone, origem }));
 
     const veiculos = [
@@ -51,7 +55,11 @@
       ['v9', 'c8', 'RTF7K48', 'Chevrolet Onix Plus', 2020, 'R-134a'],
       ['v10', 'c9', 'NZA2G61', 'Nissan Kicks', 2018, 'R-134a'],
       ['v11', 'c10', 'SAX9L02', 'Toyota Hilux SRV', 2022, 'R-134a'],
-      ['v12', 'c6', 'OKT3M77', 'Mercedes-Benz C180', 2016, 'R-134a']
+      ['v12', 'c6', 'OKT3M77', 'Mercedes-Benz C180', 2016, 'R-134a'],
+      ['v13', 'c11', 'PJQ6A44', 'Fiat Toro Volcano', 2021, 'R-134a'],
+      ['v14', 'c12', 'RTA9C15', 'Toyota Yaris XLS', 2022, 'R-134a'],
+      ['v15', 'c13', 'SBN3D70', 'Chevrolet Spin LTZ', 2019, 'R-134a'],
+      ['v16', 'c14', 'OUK1E28', 'Peugeot 2008 Griffe', 2020, 'R-134a']
     ].map(([id, cliente, placa, modelo, ano, gas]) => ({ id, cliente, placa, modelo, ano, gas }));
 
     const it = (desc, tipo, valor) => ({ desc, tipo, valor });
@@ -89,7 +97,7 @@
     for (let m = 5; m >= 0; m--) {
       const qtd = [14, 17, 21, 26, 31, 19][5 - m];
       for (let k = 0; k < qtd; k++) {
-        const v = veiculos[(k * 7 + m) % veiculos.length];
+        const v = veiculos[(k * 7 + m) % 12];
         const s = servs[(k + m) % servs.length];
         const base = { avaliacao: 120, higienizacao: 260, filtro: 140, carga: 390, compressor: 2300, condensador: 1150 }[s];
         const d = new Date(hoje); d.setMonth(d.getMonth() - m); d.setDate(1 + (k * 3) % 27);
@@ -102,6 +110,11 @@
     historico.push({ id: 'OS-2121', veiculo: 'v6', servico: 'higienizacao', data: dia(-183), valor: 260 });
     historico.push({ id: 'OS-2122', veiculo: 'v8', servico: 'filtro', data: dia(-190), valor: 140 });
     historico.push({ id: 'OS-1980', veiculo: 'v10', servico: 'carga', data: dia(-362), valor: 390 });
+    historico.push({ id: 'OS-2101', veiculo: 'v13', servico: 'higienizacao', data: dia(-185), valor: 260 });
+    historico.push({ id: 'OS-2133', veiculo: 'v14', servico: 'higienizacao', data: dia(-176), valor: 260 });
+    historico.push({ id: 'OS-2140', veiculo: 'v15', servico: 'filtro', data: dia(-174), valor: 140 });
+    historico.push({ id: 'OS-1995', veiculo: 'v16', servico: 'carga', data: dia(-350), valor: 410 });
+    historico.push({ id: 'OS-2160', veiculo: 'v16', servico: 'higienizacao', data: dia(-165), valor: 260 });
 
     const agendamentos = [
       { id: 'AG-501', data: dia(0), periodo: 'manhã', nome: 'Diego Santana (exemplo)', fone: '71 98701-6632', placa: 'OUZ4D87', modelo: 'Honda Civic 2017', servico: 'higienizacao', sintoma: 'Cheiro ruim', origem: 'site', status: 'confirmado' },

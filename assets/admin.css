@@ -84,7 +84,7 @@ table.t td.n{font-family:var(--mono);font-weight:600;text-align:right;white-spac
 .rk .bar i{display:block;height:100%;background:var(--navy)}
 
 /* diálogo */
-dialog{border:0;border-radius:14px;padding:0;width:min(860px,96vw);max-height:92vh;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);color:var(--tinta)}
+dialog{margin:auto;border:0;border-radius:14px;padding:0;width:min(860px,96vw);max-height:92vh;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);color:var(--tinta)}
 dialog::backdrop{background:rgba(11,20,48,.55)}
 .dlg-cab{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 22px;background:var(--navy);color:#fff;position:sticky;top:0;z-index:2}
 .dlg-cab h2{font:800 22px var(--tit);font-stretch:85%}
