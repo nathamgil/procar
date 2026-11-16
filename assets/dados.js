@@ -2,7 +2,7 @@
    Site e painel leem e gravam a mesma base, então um agendamento feito
    no site aparece na agenda do painel. */
 (function () {
-  const CHAVE = 'procar_db_v2';
+  const CHAVE = 'procar_db_v3';
   const ETAPAS = [
     { id: 'recebido', nome: 'Recebido', curto: 'Recebido' },
     { id: 'diagnostico', nome: 'Em diagnóstico', curto: 'Diagnóstico' },
@@ -138,7 +138,50 @@
       { id: 'e11', item: 'Corante UV para vazamento', un: 'frasco', qtd: 4, min: 2, custo: 35 }
     ];
 
-    return { clientes, veiculos, os, historico, agendamentos, estoque, contatados: {} };
+
+    // ---- cadastro completo, equipe e vistoria (dados de exemplo) ----
+    const equipe = [
+      { id: 'f1', nome: 'Anderson', funcao: 'Técnico de refrigeração' },
+      { id: 'f2', nome: 'Rafael', funcao: 'Técnico eletricista' },
+      { id: 'f3', nome: 'Thianá', funcao: 'Gerente comercial' }
+    ];
+    const cpfDe = n => { // CPF fictício com dígitos verificadores válidos
+      const b = String(100000000 + n * 7919 % 899999999).slice(0, 9).split('').map(Number);
+      const dv = a => { const r = a.reduce((t, d, i) => t + d * (a.length + 1 - i), 0) * 10 % 11; return r === 10 ? 0 : r; };
+      const d1 = dv(b), d2 = dv([...b, d1]); const t = b.join('') + d1 + d2;
+      return t.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    };
+    const RUAS = [['Rua Caetano Moura', 'Federação', '40210-341'], ['Av. Cardeal da Silva', 'Federação', '40231-305'], ['Rua Marquês de Monte Santo', 'Rio Vermelho', '41940-330'], ['Av. Oceânica', 'Ondina', '40170-010'], ['Rua Waldemar Falcão', 'Brotas', '40296-710'], ['Av. Garibaldi', 'Ondina', '40170-130'], ['Rua Amazonas', 'Pituba', '41830-380']];
+    clientes.forEach((c, i) => {
+      const pj = c.origem === 'Frota';
+      const r = RUAS[i % RUAS.length];
+      Object.assign(c, {
+        tipo: pj ? 'pj' : 'pf', doc: pj ? '' : cpfDe(i + 3), fantasia: '',
+        email: pj ? '' : c.nome.toLowerCase().normalize('NFD').replace(/[^a-z ]/g, '').trim().split(' ').slice(0, 2).join('.') + '@exemplo.com',
+        cep: r[2], endereco: r[0], numero: String(40 + i * 37), bairro: r[1], cidade: 'Salvador', uf: 'BA'
+      });
+    });
+    const CORES = ['Prata', 'Branco', 'Preto', 'Cinza', 'Vermelho', 'Azul'];
+    const WMI = { Toyota: '9BR', Jeep: '988', Fiat: '9BD', Renault: '93Y', Honda: '93H', Hyundai: '9BH', BMW: 'WBA', VW: '9BW', Chevrolet: '9BG', Nissan: '94D', 'Mercedes-Benz': 'WDD', Peugeot: '936' };
+    veiculos.forEach((v, i) => {
+      const marca = v.modelo.split(' ')[0];
+      const serie = (v.placa + 'KT' + String(100000 + i * 48271 % 899999)).replace(/[IOQ]/g, 'X');
+      Object.assign(v, { anoModelo: v.ano + (i % 2), cor: CORES[i % CORES.length], km: 18000 + (i * 13337) % 90000, combustivel: i % 5 === 2 ? 'Diesel' : 'Flex', chassi: ((WMI[marca] || '9BX') + serie).slice(0, 17) });
+    });
+    const itensOk = { estepe: true, macaco: true, chave: true, triangulo: true, tapetes: true, som: true, manual: false, documento: true };
+    os.forEach((o, i) => { o.responsavel = o.tecnico; o.genius = ''; o.nf = ''; o.vistoria = null; });
+    const porId = id => os.find(o => o.id === id);
+    porId('OS-2611').vistoria = { feita: true, por: 'Thianá', hora: '08:42', combustivel: 2, km: 61480, itens: { ...itensOk }, luzes: [], pertences: 'Cadeirinha infantil no banco de trás.', obs: '',
+      marcas: [{ x: 262, y: 214, tipo: 'risco', obs: 'Risco fino, cerca de 10 cm' }, { x: 118, y: 62, tipo: 'pintura', obs: 'Tom diferente do restante' }],
+      assinatura: [[30, 78, 52, 40, 70, 84, 92, 36, 112, 80, 128, 58, 150, 74, 176, 52, 196, 76], [205, 60, 240, 56, 282, 66, 330, 52]], fotos: {} };
+    porId('OS-2610').vistoria = { feita: true, por: 'Anderson', hora: '15:10', combustivel: 3, km: 43210, itens: { ...itensOk, manual: true }, luzes: [], pertences: '', obs: 'Sem avarias aparentes.', marcas: [],
+      assinatura: [[40, 70, 66, 44, 90, 82, 120, 40, 150, 76, 190, 58, 240, 70]], fotos: {} };
+    porId('OS-2605').vistoria = { feita: true, por: 'Rafael', hora: '10:05', combustivel: 1, km: 98730, itens: { ...itensOk, tapetes: false }, luzes: ['Injeção'], pertences: 'Óculos de sol no console.', obs: '',
+      marcas: [{ x: 452, y: 150, tipo: 'amassado', obs: 'Tampa do porta-malas' }],
+      assinatura: [[36, 66, 70, 50, 96, 80, 130, 46, 170, 78, 210, 54, 262, 72]], fotos: {} };
+    porId('OS-2610').genius = '18422'; porId('OS-2607').genius = '18419'; porId('OS-2607').nf = 'emitida';
+
+    return { clientes, veiculos, os, historico, agendamentos, estoque, equipe, contatados: {} };
   }
 
   function carregar() {
